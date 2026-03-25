@@ -66,10 +66,9 @@ export const useEmbeddingStore = defineStore('embedding', () => {
   async function loadConfigs() {
     isLoading.value = true
     try {
-      const [configsData, activeId, isEnabled, stats] = await Promise.all([
+      const [configsData, activeId, stats] = await Promise.all([
         window.embeddingApi.getAllConfigs(),
         window.embeddingApi.getActiveConfigId(),
-        window.embeddingApi.isEnabled(),
         window.embeddingApi.getVectorStoreStats(),
       ])
       configs.value = configsData

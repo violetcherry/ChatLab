@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDateFormat, useDebounceFn } from '@vueuse/core'
+import { useDebounceFn } from '@vueuse/core'
 
 const props = defineProps<{
   open: boolean
@@ -34,8 +34,8 @@ type TimeRangePreset = 'today' | 'yesterday' | 'week' | 'month' | 'custom'
 const selectedPreset = ref<TimeRangePreset>('today')
 
 // 自定义时间范围
-const customStartDate = ref<Date | null>(null)
-const customEndDate = ref<Date | null>(null)
+const customStartDate = ref('')
+const customEndDate = ref('')
 
 // 会话列表
 interface SessionItem {
@@ -43,7 +43,8 @@ interface SessionItem {
   startTs: number
   endTs: number
   messageCount: number
-  summary: string | null
+  // 与 sessionApi 返回值保持一致，历史数据里 summary 可能不存在。
+  summary?: string | null
 }
 const sessions = ref<SessionItem[]>([])
 const isLoading = ref(false)
@@ -102,9 +103,11 @@ const timeRange = computed(() => {
     }
     case 'custom':
       if (customStartDate.value && customEndDate.value) {
+        const start = new Date(customStartDate.value)
+        const end = new Date(customEndDate.value)
         return {
-          start: customStartDate.value.getTime(),
-          end: new Date(customEndDate.value.getTime() + 24 * 60 * 60 * 1000 - 1).getTime(), // 当天结束
+          start: start.getTime(),
+          end: new Date(end.getTime() + 24 * 60 * 60 * 1000 - 1).getTime(), // 当天结束
         }
       }
       return null
@@ -330,11 +333,6 @@ function close() {
     shouldStop.value = true
   }
   emit('update:open', false)
-}
-
-// 格式化时间戳
-function formatTs(ts: number) {
-  return useDateFormat(new Date(ts * 1000), 'MM-DD HH:mm').value
 }
 </script>
 

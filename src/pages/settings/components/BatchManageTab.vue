@@ -51,13 +51,6 @@ const canMerge = computed(() => {
   return platforms.size === 1
 })
 
-// 选中会话的平台
-const selectedPlatform = computed(() => {
-  if (selectedIds.value.size === 0) return null
-  const selectedSessions = sessions.value.filter((s) => selectedIds.value.has(s.id))
-  return selectedSessions[0]?.platform || null
-})
-
 // 全选状态（基于过滤后的列表）
 const isAllSelected = computed(() => {
   return filteredSessions.value.length > 0 && filteredSessions.value.every((s) => selectedIds.value.has(s.id))

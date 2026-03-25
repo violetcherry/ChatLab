@@ -33,10 +33,10 @@ export interface SQLResult {
   limited: boolean
 }
 
-// 表/列的多语言标签映射
-type LocaleType = 'zh-CN' | 'en-US'
+// 表/列标签目前只维护中英文；其他 locale 先归一化后复用。
+type LabelLocale = 'zh-CN' | 'en-US'
 
-export const TABLE_LABELS: Record<LocaleType, Record<string, string>> = {
+export const TABLE_LABELS: Record<LabelLocale, Record<string, string>> = {
   'zh-CN': {
     message: '消息记录',
     member: '成员',
@@ -51,7 +51,7 @@ export const TABLE_LABELS: Record<LocaleType, Record<string, string>> = {
   },
 }
 
-export const COLUMN_LABELS: Record<LocaleType, Record<string, Record<string, string>>> = {
+export const COLUMN_LABELS: Record<LabelLocale, Record<string, Record<string, string>>> = {
   'zh-CN': {
     message: {
       id: '消息ID',
@@ -119,11 +119,15 @@ export const COLUMN_LABELS: Record<LocaleType, Record<string, Record<string, str
 }
 
 // 获取表的标签
-export function getTableLabel(tableName: string, locale: LocaleType = 'zh-CN'): string {
-  return TABLE_LABELS[locale]?.[tableName] || tableName
+export function getTableLabel(tableName: string, locale: string = 'zh-CN'): string {
+  return TABLE_LABELS[normalizeLabelLocale(locale)]?.[tableName] || tableName
 }
 
 // 获取列的标签
-export function getColumnLabel(tableName: string, columnName: string, locale: LocaleType = 'zh-CN'): string {
-  return COLUMN_LABELS[locale]?.[tableName]?.[columnName] || columnName
+export function getColumnLabel(tableName: string, columnName: string, locale: string = 'zh-CN'): string {
+  return COLUMN_LABELS[normalizeLabelLocale(locale)]?.[tableName]?.[columnName] || columnName
+}
+
+function normalizeLabelLocale(locale: string): LabelLocale {
+  return locale.startsWith('zh') ? 'zh-CN' : 'en-US'
 }

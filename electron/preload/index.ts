@@ -11,6 +11,9 @@ import { chatApi, mergeApi } from './apis/chat'
 import { aiApi, llmApi, agentApi, embeddingApi, assistantApi, skillApi } from './apis/ai'
 import { nlpApi, networkApi, cacheApi, sessionApi } from './apis/utils'
 
+// 为渲染进程提供统一的类型入口，避免 type-only import 指向无导出的运行时代码。
+export type { PreprocessConfig, EmbeddingServiceConfig, EmbeddingServiceConfigDisplay } from './apis/ai'
+
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.

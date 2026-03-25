@@ -134,7 +134,7 @@ export function getDefaultRoleDefinition(locale: LocaleType = 'zh-CN'): string {
 }
 
 /** @deprecated responseRules 已合并到 systemPrompt */
-export function getDefaultResponseRules(locale: LocaleType = 'zh-CN'): string {
+export function getDefaultResponseRules(_locale: LocaleType = 'zh-CN'): string {
   return ''
 }
 

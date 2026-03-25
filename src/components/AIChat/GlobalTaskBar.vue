@@ -51,7 +51,7 @@ async function handleOpenTask() {
       <!-- 默认态直接作为返回入口，不再保留额外展开层。 -->
       <button
         class="group flex h-9 items-center gap-1.5 overflow-hidden rounded-full bg-primary-500 px-2 shadow-[0_10px_24px_rgba(15,23,42,0.12)] transition-all hover:-translate-y-0.5 hover:bg-primary-600 hover:shadow-[0_16px_32px_rgba(15,23,42,0.16)] dark:bg-primary-500 dark:hover:bg-primary-400"
-        :title="`${t('ai.chat.backgroundTask.return')} · ${activeTask.sessionName}`"
+        :title="`${t('ai.chat.backgroundTask.return')} · ${activeTask?.sessionName ?? ''}`"
         @click="handleOpenTask"
       >
         <div

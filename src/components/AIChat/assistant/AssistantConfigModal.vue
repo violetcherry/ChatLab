@@ -387,7 +387,7 @@ function closeModal() {
                   {{ t('ai.assistant.config.presetQuestions') }}
                 </label>
                 <div class="space-y-2">
-                  <div v-for="(q, index) in form.presetQuestions" :key="index" class="flex items-center gap-2">
+                  <div v-for="(_, index) in form.presetQuestions" :key="index" class="flex items-center gap-2">
                     <UInput
                       v-model="form.presetQuestions[index]"
                       class="min-w-0 flex-1"

@@ -39,7 +39,7 @@ interface AIServiceConfig {
   id: string
   name: string
   provider: string
-  apiKey: string
+  apiKey?: string
   apiKeySet: boolean
   model?: string
   baseUrl?: string

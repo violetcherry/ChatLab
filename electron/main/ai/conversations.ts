@@ -7,6 +7,8 @@ import Database from 'better-sqlite3'
 import * as path from 'path'
 import { getAiDataDir, ensureDir } from '../paths'
 
+const DEFAULT_GENERAL_ID = 'general_cn'
+
 // AI 数据库实例
 let AI_DB: Database.Database | null = null
 

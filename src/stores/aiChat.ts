@@ -381,6 +381,16 @@ export const useAIChatStore = defineStore('aiChatRuntime', () => {
     activeTask.value = null
   }
 
+  /**
+   * 会话创建成功后，把后台任务绑定到真实 conversationId。
+   * 单独抽成 helper，避免在长 async 流程里触发异常的类型缩窄。
+   */
+  function updateActiveTaskConversationId(chatKey: string, conversationId: string): void {
+    if (!activeTask.value) return
+    if (activeTask.value.chatKey !== chatKey) return
+    activeTask.value.conversationId = conversationId
+  }
+
   function buildFallbackAgentStatus(state: AIChatSessionState): AgentRuntimeStatus {
     return {
       phase: 'preparing',
@@ -742,9 +752,7 @@ export const useAIChatStore = defineStore('aiChatRuntime', () => {
         resolvedConversationId = conversation.id
         renameBufferKey(state, DRAFT_CONVERSATION_KEY, conversation.id)
         targetBuffer.assistantId = currentAssistantId
-        if (activeTask.value?.chatKey === chatKey) {
-          activeTask.value.conversationId = conversation.id
-        }
+        updateActiveTaskConversationId(chatKey, conversation.id)
       }
 
       const maxHistoryRounds = aiGlobalSettings.value.maxHistoryRounds ?? 5

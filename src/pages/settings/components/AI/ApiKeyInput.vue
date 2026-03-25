@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useAttrs, computed } from 'vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     modelValue: string
     placeholder?: string

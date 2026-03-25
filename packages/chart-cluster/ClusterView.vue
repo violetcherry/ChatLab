@@ -12,7 +12,7 @@ import { TooltipComponent, GridComponent, VisualMapComponent } from 'echarts/com
 import { CanvasRenderer } from 'echarts/renderers'
 import type { EChartsOption } from 'echarts'
 import { loadClusterGraph } from './queries'
-import type { ClusterGraphData, ClusterGraphOptions, ClusterGraphNode } from './types'
+import type { ClusterGraphData, ClusterGraphOptions } from './types'
 
 echarts.use([HeatmapChart, TooltipComponent, GridComponent, VisualMapComponent, CanvasRenderer])
 

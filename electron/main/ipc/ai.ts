@@ -1,5 +1,5 @@
 // electron/main/ipc/ai.ts
-import { ipcMain, BrowserWindow, shell } from 'electron'
+import { ipcMain, shell } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as aiConversations from '../ai/conversations'
@@ -13,11 +13,25 @@ import { getActiveConfig, buildPiModel } from '../ai/llm'
 import * as assistantManager from '../ai/assistant'
 import type { AssistantConfig } from '../ai/assistant/types'
 import * as skillManager from '../ai/skills'
-import { completeSimple, streamSimple, type TextContent as PiTextContent } from '@mariozechner/pi-ai'
+import {
+  completeSimple,
+  streamSimple,
+  type Message as PiMessage,
+  type TextContent as PiTextContent,
+} from '@mariozechner/pi-ai'
 import { t } from '../i18n'
 import type { ToolContext } from '../ai/tools/types'
 import { getDefaultRulesForLocale, mergeRulesForLocale } from '../ai/preprocessor/builtin-rules'
 import type { IpcContext } from './types'
+
+function toPiSimpleMessages(messages: Array<{ role: string; content: string }>, timestamp: number): PiMessage[] {
+  // pi-ai 的 simple API 在类型上要求完整 Message 联合，这里沿用现有轻量消息格式并集中做兼容转换。
+  return messages.map((message) => ({
+    role: message.role as 'user' | 'assistant',
+    content: message.content,
+    timestamp,
+  })) as unknown as PiMessage[]
+}
 
 // ==================== AI Agent 请求追踪 ====================
 // 用于跟踪活跃的 Agent 请求，支持中止操作
@@ -147,22 +161,22 @@ export function registerAIHandlers({ win }: IpcContext): void {
    * 创建新的 AI 对话
    * 参数契约与 preload / 数据层保持一致：(sessionId, title?)
    */
-  ipcMain.handle('ai:createConversation', async (_, sessionId: string, title?: string, assistantId?: string) => {
-    try {
-      if (!assistantId) {
-        throw new Error('assistantId is required when creating a conversation')
+  ipcMain.handle(
+    'ai:createConversation',
+    async (_, sessionId: string, title: string | undefined, assistantId: string) => {
+      try {
+        return aiConversations.createConversation(sessionId, title, assistantId)
+      } catch (error) {
+        console.error('Failed to create AI conversation:', error)
+        throw error
       }
-      return aiConversations.createConversation(sessionId, title, assistantId)
-    } catch (error) {
-      console.error('Failed to create AI conversation:', error)
-      throw error
     }
-  })
+  )
 
   /**
    * 获取所有 AI 对话列表
    */
-  ipcMain.handle('ai:getConversations', async (_, sessionId?: string) => {
+  ipcMain.handle('ai:getConversations', async (_, sessionId: string) => {
     try {
       return aiConversations.getConversations(sessionId)
     } catch (error) {
@@ -485,11 +499,7 @@ export function registerAIHandlers({ win }: IpcContext): void {
           piModel,
           {
             systemPrompt: systemMsg?.content,
-            messages: nonSystemMsgs.map((m) => ({
-              role: m.role as 'user' | 'assistant',
-              content: m.content,
-              timestamp: now,
-            })),
+            messages: toPiSimpleMessages(nonSystemMsgs, now),
           },
           {
             apiKey: activeConfig.apiKey,
@@ -536,11 +546,7 @@ export function registerAIHandlers({ win }: IpcContext): void {
           piModel,
           {
             systemPrompt: systemMsg?.content,
-            messages: nonSystemMsgs.map((m) => ({
-              role: m.role as 'user' | 'assistant',
-              content: m.content,
-              timestamp: now,
-            })),
+            messages: toPiSimpleMessages(nonSystemMsgs, now),
           },
           {
             apiKey: activeConfig.apiKey,
